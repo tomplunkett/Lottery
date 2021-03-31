@@ -1,0 +1,104 @@
+// SPDX-License-Identifier: GPL-3.0
+
+pragma solidity >=0.7.0 <0.9.0;
+//compiler 0.8.1
+/**
+ * @title Lottery
+ * @dev Decentralized lottery leveraging ETHereum and Chainlink
+ */
+contract Lottery {
+
+    uint256 number;
+
+    /**
+     * @dev Store value in variable
+     * @param num value to store
+     */
+    function store(uint256 num) public {
+        number = num;
+    }
+
+    /**
+     * @dev Return value 
+     * @return value of 'number'
+     */
+    function retrieve() public view returns (uint256){
+        return number;
+    }
+    
+    struct Event{
+        address owner;
+        uint64 ticketPrice;
+        uint16 ticketsRemaining;
+        mapping(uint16 => address) attendees;
+    }
+
+    struct Offering{
+        address buyer;
+        uint64 price;
+        uint256 deadline;
+    }
+
+    uint16 numEvents;
+    address owner;
+    uint64 transactionFee;
+    mapping(uint16 => Event) events;
+    mapping(bytes32 => Offering) offerings;
+
+    function ticketDepot(uint64 _transactionFee) public {
+        transactionFee = _transactionFee;
+        owner = tx.origin;
+    }
+
+
+    function createEvent(uint64 _ticketPrice, uint16
+    _ticketsAvailable) public returns (uint16 eventID){
+        numEvents++;
+        events[numEvents].owner = tx.origin;
+        events[numEvents].ticketPrice = _ticketPrice;
+        events[numEvents].ticketsRemaining = _ticketsAvailable;
+        return numEvents;
+    }
+    
+/** to be debugged
+    modifier ticketsAvailable(uint16 _eventID){
+    
+    require.events[_eventID].ticketsRemaining >= 0;
+        
+
+    function buyNewTicket(uint16 _eventID, address _attendee, ticketsAvailable _eventID) public payable returns (uint16 ticketID){
+        if (msg.sender == events[_eventID].owner || msg.value >
+            events[_eventID].ticketPrice + transactionFee){
+            ticketID = events[_eventID].ticketsRemaining--;
+            events[_eventID].attendees[ticketID] = _attendee;
+            events[_eventID].owner.send(msg.value - transactionFee);
+            return ticketID;
+        }
+    }
+
+
+    function offerTicket(uint16 _eventID, uint16 _ticketID, uint64
+    _price, address _buyer, uint16 _offerWindow) public {
+        require(msg.value >= transactionFee);
+        bytes32 offerID = keccak256(_eventID+_ticketID);
+        require (offerings[offerID] == 0);
+        offerings[offerID].buyer = _buyer;
+        offerings[offerID].price = _price;
+        offerings[offerID].deadline = block.number + _offerWindow;
+    }
+
+    function buyOfferedTicket(uint16 _eventID, uint16 _ticketID,
+    address _newAttendee) public payable{
+        bytes32 offerID = sha3(_eventID+_ticketID);
+        if (msg.value > offerings[offerID].price &&
+        block.number < offerings[offerID].deadline &&
+        (msg.sender == offerings[offerID].buyer ||
+        offerings[offerID].buyer == 0)) {
+        events[_eventID].attendees[_ticketID]
+        .send(offerings[offerID].price);
+        events[_eventID].attendees[_ticketID] = _newAttendee;
+        delete offerings[offerID];
+        }
+    }
+    */
+}
